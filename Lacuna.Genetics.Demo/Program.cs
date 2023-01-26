@@ -1,3 +1,29 @@
 ﻿using Lacuna.Genetics.Core;
-var test = "TACCGCTTCATAAACCGCTAGACT";
-Console.WriteLine(JobsHandler.EncodeStrand(test));
+using Lacuna.Genetics.Core.Model;
+
+var user = new User("filimor", "zkdvz3dA3!nBJcn94y**");
+
+var doJob = true;
+var jobsHandler = new JobsHandler(user);
+
+while (doJob)
+{
+    try
+    {
+        var response = jobsHandler.DoJobAsync().Result;
+        Console.WriteLine($"{response.Code}\t{response.Job.Id}");
+        Console.WriteLine(response.Message);
+        Console.WriteLine();
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        Console.WriteLine(e.InnerException?.Message);
+        Console.WriteLine(e.StackTrace);
+        Console.WriteLine(e.Source);
+        Console.WriteLine();
+    }
+
+    Console.WriteLine("Do another? (y/n)");
+    doJob = Console.ReadLine() == "y";
+}

@@ -1,152 +1,65 @@
-﻿using System.Text;
+﻿using Lacuna.Genetics.Core.Model;
 
 namespace Lacuna.Genetics.Core;
 
-public static class JobsHandler
+public class JobsHandler
 {
-    public static string DecodeStrand(string strand)
+    private readonly HttpService _httpService;
+    private readonly User _user;
+    private string _accessToken = string.Empty;
+    private DateTime _accessTokenExpiration;
+
+    // TODO: Allow user creation?
+    public JobsHandler(User user)
     {
-        var encodedBytes = Convert.FromBase64String(strand);
-        var encodedBits = new StringBuilder();
-
-        foreach (var encodedByte in encodedBytes)
-        {
-            encodedBits.Append(Convert.ToString(encodedByte, 2).PadLeft(8, '0'));
-        }
-
-        var decodedStrand = new StringBuilder();
-
-        for (var i = 0; i < encodedBits.Length; i += 2)
-        {
-            var bit = encodedBits.ToString(i, 2);
-            switch (bit)
-            {
-                case "00":
-                    decodedStrand.Append('A');
-                    break;
-                case "01":
-                    decodedStrand.Append('C');
-                    break;
-                case "10":
-                    decodedStrand.Append('G');
-                    break;
-                case "11":
-                    decodedStrand.Append('T');
-                    break;
-            }
-        }
-
-        return decodedStrand.ToString();
+        _httpService = new HttpService();
+        _user = user;
     }
 
-    public static string EncodeStrand(string strand)
+    // TODO: Implement parallel processing of jobs
+    public async Task<Response> DoJobAsync()
     {
-        var sb = new StringBuilder();
-
-        foreach (var c in strand)
-        {
-            switch (c)
-            {
-                case 'A':
-                    sb.Append("00");
-                    break;
-                case 'C':
-                    sb.Append("01");
-                    break;
-                case 'G':
-                    sb.Append("10");
-                    break;
-                case 'T':
-                    sb.Append("11");
-                    break;
-            }
-        }
-
-        byte[] byteArray = new byte[sb.Length / 8];
-
-        for (var i = 0; i < sb.Length; i += 8)
-        {
-            byteArray[i / 8] = Convert.ToByte(sb.ToString().Substring(i, 8), 2);
-        }
-
-        return Convert.ToBase64String(byteArray);
+        var job = GetJob();
+        var response = await HandleJobAsync(job);
+        response.Job = job;
+        return response;
     }
 
-    public static bool CheckGene(string strandEncoded, string geneEncoded)
+    public Job? GetJob()
     {
-        string strand = DecodeStrand(strandEncoded);
-        var gene = DecodeStrand(geneEncoded);
-        Console.WriteLine(strand);
-        Console.WriteLine(gene);
-
-        var templateStrand = GetTemplateStrand(strand);
-        var lcs = FindLongestCommonSubstring(templateStrand, gene);
-        var matchRate = (double)lcs.Length / gene.Length;
-
-        return matchRate >= 0.5;
+        RefreshAccessToken();
+        return _httpService.RequestJobAsync(_accessToken).Result;
     }
 
-    private static string GetTemplateStrand(string inputStrand)
+    public async Task<Response> HandleJobAsync(Job job)
     {
-        if (inputStrand.StartsWith("CAT"))
+        switch (job.Type)
         {
-            return inputStrand;
+            case "EncodeStrand":
+                var encodedStrand = LabModule.EncodeStrand(job.Strand);
+                return await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
+                    new Result { StrandEncoded = encodedStrand });
+            case "DecodeStrand":
+                var decodedStrand = LabModule.DecodeStrand(job.StrandEncoded);
+                return await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
+                    new Result { Strand = decodedStrand });
+            case "CheckGene":
+                var isActivated = LabModule.CheckGene(job.StrandEncoded, job.GeneEncoded);
+                return await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
+                    new Result { IsActivated = isActivated });
+            default:
+                return null;
         }
-
-        var outputStrand = new StringBuilder();
-
-        foreach (var c in inputStrand)
-        {
-            switch (c)
-            {
-                case 'A':
-                    outputStrand.Append('T');
-                    break;
-                case 'T':
-                    outputStrand.Append('A');
-                    break;
-                case 'C':
-                    outputStrand.Append('G');
-                    break;
-                case 'G':
-                    outputStrand.Append('C');
-                    break;
-            }
-        }
-
-        return outputStrand.ToString();
     }
 
-    private static string FindLongestCommonSubstring(string s1, string s2)
+    private void RefreshAccessToken()
     {
-        var m = s1.Length;
-        var n = s2.Length;
-        var longest = 0;
-        var lcs = string.Empty;
-        var table = new int[m, n];
-
-        for (var i = 0; i < m; i++)
+        if (!string.IsNullOrEmpty(_accessToken) && _accessTokenExpiration >= DateTime.Now)
         {
-            for (var j = 0; j < n; j++)
-            {
-                if (s1[i] != s2[j])
-                {
-                    continue;
-                }
-
-                table[i, j] = i == 0 || j == 0 ? 1 : 1 + table[i - 1, j - 1];
-
-                if (table[i, j] <= longest)
-                {
-                    continue;
-                }
-
-                longest = table[i, j];
-                var start = i - table[i, j] + 1;
-                lcs = s1.Substring(start, longest);
-            }
+            return;
         }
 
-        return lcs;
+        _accessToken = _httpService.RequestAccessTokenAsync(_user).Result;
+        _accessTokenExpiration = DateTime.Now.AddMinutes(2);
     }
 }

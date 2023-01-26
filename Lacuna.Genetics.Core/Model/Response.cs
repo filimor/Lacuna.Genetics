@@ -1,6 +1,6 @@
 ﻿namespace Lacuna.Genetics.Core.Model;
 
-internal class Response
+public class Response
 {
     public string Code { get; set; }
     public string Message { get; set; }

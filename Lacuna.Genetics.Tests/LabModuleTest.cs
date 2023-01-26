@@ -5,14 +5,14 @@ using Xunit;
 
 namespace Lacuna.Genetics.Tests;
 
-public class JobsHandlerTest
+public class LabModuleTest
 {
     [Theory]
     [ClassData(typeof(StrandsClassData))]
     public void DecodeStrand_OnValidInput_ReturnValidOutput(string expectedStrand, string encodedStrand)
     {
         //  Act
-        var decodedStrand = JobsHandler.DecodeStrand(encodedStrand);
+        var decodedStrand = LabModule.DecodeStrand(encodedStrand);
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
@@ -23,7 +23,7 @@ public class JobsHandlerTest
     public void EncodeStrand_OnValidInput_ReturnValidOutput(string encodedStrand, string expectedStrand)
     {
         //  Act
-        var decodedStrand = JobsHandler.EncodeStrand(encodedStrand);
+        var decodedStrand = LabModule.EncodeStrand(encodedStrand);
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
@@ -35,7 +35,7 @@ public class JobsHandlerTest
     public void CheckGene_OnActivatedGene_ReturnTrue(string gene, string strand)
     {
         //  Act
-        var result = JobsHandler.CheckGene(strand, gene);
+        var result = LabModule.CheckGene(strand, gene);
 
         // Assert
         result.Should().BeTrue();
@@ -46,7 +46,7 @@ public class JobsHandlerTest
     //public void CheckGene_OnInactivatedGene_ReturnFalse(string gene, string strand)
     //{
     //    //  Act
-    //    var result = JobsHandler.CheckGene(strand, gene);
+    //    var result = LabModule.CheckGene(strand, gene);
 
     //    // Assert
     //    result.Should().BeFalse();
