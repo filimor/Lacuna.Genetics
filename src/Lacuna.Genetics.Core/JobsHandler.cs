@@ -9,12 +9,14 @@ public class JobsHandler
     private string _accessToken = string.Empty;
     private DateTime _accessTokenExpiration;
     private readonly ILaboratory _laboratory;
+    private readonly IHttpService _httpService;
 
     // TODO: Allow user creation?
-    public JobsHandler(User user, ILaboratory laboratory)
+    public JobsHandler(User user, ILaboratory laboratory, IHttpService httpService)
     {
         _user = user;
         _laboratory = laboratory;
+        _httpService = httpService;
     }
 
     // TODO: Implement parallel processing of jobs
@@ -29,7 +31,7 @@ public class JobsHandler
     public Job? GetJob()
     {
         RefreshAccessToken();
-        return HttpService.RequestJobAsync(_accessToken).Result;
+        return _httpService.RequestJobAsync(_accessToken).Result;
     }
 
     public async Task<Response> HandleJobAsync(Job job)
@@ -38,15 +40,15 @@ public class JobsHandler
         {
             case "EncodeStrand":
                 var encodedStrand = _laboratory.EncodeStrand(job.Strand);
-                return await HttpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
+                return await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
                     new Result { StrandEncoded = encodedStrand });
             case "DecodeStrand":
                 var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded);
-                return await HttpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
+                return await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
                     new Result { Strand = decodedStrand });
             case "CheckGene":
                 var isActivated = _laboratory.CheckGene(job.StrandEncoded, job.GeneEncoded);
-                return await HttpService.SubmitCheckGeneAsync(_accessToken, job.Id,
+                return await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
                     new Result { IsActivated = isActivated });
             default:
                 return null;
@@ -60,7 +62,7 @@ public class JobsHandler
             return;
         }
 
-        _accessToken = HttpService.RequestAccessTokenAsync(_user).Result;
+        _accessToken = _httpService.RequestAccessTokenAsync(_user).Result;
         _accessTokenExpiration = DateTime.Now.AddMinutes(2);
     }
 }

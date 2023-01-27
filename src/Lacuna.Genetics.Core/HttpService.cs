@@ -1,11 +1,12 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Lacuna.Genetics.Core.Exceptions;
+using Lacuna.Genetics.Core.Interfaces;
 using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
 
-public static class HttpService
+public class HttpService:IHttpService
 {
     private static readonly HttpClient Client = new()
     {
@@ -13,35 +14,35 @@ public static class HttpService
     };
 
 
-    public static async Task<string?> RequestAccessTokenAsync(User user)
+    public async Task<string?> RequestAccessTokenAsync(User user)
     {
         var client = GetHttpClient();
         var response = await client.PostAsJsonAsync("api/users/login", user);
         return GetResponseContent(response).Result.AccessToken;
     }
 
-    public static async Task<Job?> RequestJobAsync(string accessToken)
+    public async Task<Job?> RequestJobAsync(string accessToken)
     {
         var client = GetHttpClient(accessToken);
         var response = await client.GetAsync("api/dna/jobs");
         return GetResponseContent(response).Result.Job;
     }
 
-    public static async Task<Response> SubmitEncodeStrandAsync(string accessToken, string jobId, Result result)
+    public async Task<Response> SubmitEncodeStrandAsync(string accessToken, string jobId, Result result)
     {
         var client = GetHttpClient(accessToken);
         var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode", result);
         return await GetResponseContent(response);
     }
 
-    public static async Task<Response> SubmitDecodeStrandAsync(string accessToken, string jobId, Result result)
+    public async Task<Response> SubmitDecodeStrandAsync(string accessToken, string jobId, Result result)
     {
         var client = GetHttpClient(accessToken);
         var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode", result);
         return await GetResponseContent(response);
     }
 
-    public static async Task<Response> SubmitCheckGeneAsync(string accessToken, string jobId, Result result)
+    public async Task<Response> SubmitCheckGeneAsync(string accessToken, string jobId, Result result)
     {
         var client = GetHttpClient(accessToken);
         var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene", result);
