@@ -1,4 +1,4 @@
-﻿namespace Lacuna.Genetics.Core.Model;
+﻿namespace Lacuna.Genetics.Core.Models;
 
 public class Response
 {

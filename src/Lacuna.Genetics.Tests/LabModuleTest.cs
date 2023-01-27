@@ -11,7 +11,7 @@ public class LabModuleTest
     [ClassData(typeof(StrandsClassData))]
     public void DecodeStrand_OnValidInput_ReturnValidOutput(string expectedStrand, string encodedStrand)
     {
-        //  Act
+        // Act
         var decodedStrand = LabModule.DecodeStrand(encodedStrand);
 
         // Assert
@@ -22,7 +22,7 @@ public class LabModuleTest
     [ClassData(typeof(StrandsClassData))]
     public void EncodeStrand_OnValidInput_ReturnValidOutput(string encodedStrand, string expectedStrand)
     {
-        //  Act
+        // Act
         var decodedStrand = LabModule.EncodeStrand(encodedStrand);
 
         // Assert
@@ -34,7 +34,7 @@ public class LabModuleTest
     [ClassData(typeof(ActivatedGenesClassData))]
     public void CheckGene_OnActivatedGene_ReturnTrue(string gene, string strand)
     {
-        //  Act
+        // Act
         var result = LabModule.CheckGene(strand, gene);
 
         // Assert

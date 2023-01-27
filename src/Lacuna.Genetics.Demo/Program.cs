@@ -1,5 +1,5 @@
 ﻿using Lacuna.Genetics.Core;
-using Lacuna.Genetics.Core.Model;
+using Lacuna.Genetics.Core.Models;
 
 var user = new User("filimor", "zkdvz3dA3!nBJcn94y**");
 
@@ -11,7 +11,7 @@ while (doJob)
     try
     {
         var response = jobsHandler.DoJobAsync().Result;
-        Console.WriteLine($"{response.Code}\t{response.Job.Id}");
+        Console.WriteLine($"{response.Code}\t{response.Job?.Id}");
         Console.WriteLine(response.Message);
         Console.WriteLine();
     }

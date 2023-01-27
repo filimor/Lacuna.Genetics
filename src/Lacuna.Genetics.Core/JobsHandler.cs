@@ -1,10 +1,9 @@
-﻿using Lacuna.Genetics.Core.Model;
+﻿using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
 
 public class JobsHandler
 {
-    private readonly HttpService _httpService;
     private readonly User _user;
     private string _accessToken = string.Empty;
     private DateTime _accessTokenExpiration;
@@ -12,7 +11,6 @@ public class JobsHandler
     // TODO: Allow user creation?
     public JobsHandler(User user)
     {
-        _httpService = new HttpService();
         _user = user;
     }
 
@@ -28,7 +26,7 @@ public class JobsHandler
     public Job? GetJob()
     {
         RefreshAccessToken();
-        return _httpService.RequestJobAsync(_accessToken).Result;
+        return HttpService.RequestJobAsync(_accessToken).Result;
     }
 
     public async Task<Response> HandleJobAsync(Job job)
@@ -37,15 +35,15 @@ public class JobsHandler
         {
             case "EncodeStrand":
                 var encodedStrand = LabModule.EncodeStrand(job.Strand);
-                return await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
+                return await HttpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
                     new Result { StrandEncoded = encodedStrand });
             case "DecodeStrand":
                 var decodedStrand = LabModule.DecodeStrand(job.StrandEncoded);
-                return await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
+                return await HttpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
                     new Result { Strand = decodedStrand });
             case "CheckGene":
                 var isActivated = LabModule.CheckGene(job.StrandEncoded, job.GeneEncoded);
-                return await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
+                return await HttpService.SubmitCheckGeneAsync(_accessToken, job.Id,
                     new Result { IsActivated = isActivated });
             default:
                 return null;
@@ -59,7 +57,7 @@ public class JobsHandler
             return;
         }
 
-        _accessToken = _httpService.RequestAccessTokenAsync(_user).Result;
+        _accessToken = HttpService.RequestAccessTokenAsync(_user).Result;
         _accessTokenExpiration = DateTime.Now.AddMinutes(2);
     }
 }
