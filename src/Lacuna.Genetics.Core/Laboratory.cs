@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using Lacuna.Genetics.Core.Extensions;
+using Lacuna.Genetics.Core.Interfaces;
 
 namespace Lacuna.Genetics.Core;
 
-public static class LabModule
+public class Laboratory : ILaboratory
 {
-    public static string DecodeStrand(string strand)
+    public string DecodeStrand(string strand)
     {
         var encodedBytes = Convert.FromBase64String(strand);
         var encodedBits = new StringBuilder();
@@ -40,7 +41,7 @@ public static class LabModule
         return decodedStrand.ToString();
     }
 
-    public static string EncodeStrand(string strand)
+    public string EncodeStrand(string strand)
     {
         var sb = new StringBuilder();
 
@@ -73,7 +74,7 @@ public static class LabModule
         return Convert.ToBase64String(byteArray);
     }
 
-    public static bool CheckGene(string strandEncoded, string geneEncoded)
+    public bool CheckGene(string strandEncoded, string geneEncoded)
     {
         var strand = DecodeStrand(strandEncoded);
         var gene = DecodeStrand(geneEncoded);

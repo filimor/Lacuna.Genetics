@@ -5,14 +5,17 @@ using Xunit;
 
 namespace Lacuna.Genetics.Tests;
 
-public class LabModuleTest
+public class LaboratoryTest
 {
     [Theory]
     [ClassData(typeof(StrandsClassData))]
     public void DecodeStrand_OnValidInput_ReturnValidOutput(string expectedStrand, string encodedStrand)
     {
+        // Arrange
+        var laboratory = new Laboratory();
+        
         // Act
-        var decodedStrand = LabModule.DecodeStrand(encodedStrand);
+        var decodedStrand = laboratory.DecodeStrand(encodedStrand);
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
@@ -22,8 +25,11 @@ public class LabModuleTest
     [ClassData(typeof(StrandsClassData))]
     public void EncodeStrand_OnValidInput_ReturnValidOutput(string encodedStrand, string expectedStrand)
     {
+        // Arrange
+        var laboratory = new Laboratory();
+        
         // Act
-        var decodedStrand = LabModule.EncodeStrand(encodedStrand);
+        var decodedStrand = laboratory.EncodeStrand(encodedStrand);
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
@@ -34,8 +40,11 @@ public class LabModuleTest
     [ClassData(typeof(ActivatedGenesClassData))]
     public void CheckGene_OnActivatedGene_ReturnTrue(string gene, string strand)
     {
+        // Arrange
+        var laboratory = new Laboratory();
+        
         // Act
-        var result = LabModule.CheckGene(strand, gene);
+        var result = laboratory.CheckGene(strand, gene);
 
         // Assert
         result.Should().BeTrue();
@@ -46,7 +55,7 @@ public class LabModuleTest
     //public void CheckGene_OnInactivatedGene_ReturnFalse(string gene, string strand)
     //{
     //    //  Act
-    //    var result = LabModule.CheckGene(strand, gene);
+    //    var result = Laboratory.CheckGene(strand, gene);
 
     //    // Assert
     //    result.Should().BeFalse();

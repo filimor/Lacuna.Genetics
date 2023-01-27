@@ -1,4 +1,5 @@
-﻿using Lacuna.Genetics.Core.Models;
+﻿using Lacuna.Genetics.Core.Interfaces;
+using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
 
@@ -7,11 +8,13 @@ public class JobsHandler
     private readonly User _user;
     private string _accessToken = string.Empty;
     private DateTime _accessTokenExpiration;
+    private readonly ILaboratory _laboratory;
 
     // TODO: Allow user creation?
-    public JobsHandler(User user)
+    public JobsHandler(User user, ILaboratory laboratory)
     {
         _user = user;
+        _laboratory = laboratory;
     }
 
     // TODO: Implement parallel processing of jobs
@@ -34,15 +37,15 @@ public class JobsHandler
         switch (job.Type)
         {
             case "EncodeStrand":
-                var encodedStrand = LabModule.EncodeStrand(job.Strand);
+                var encodedStrand = _laboratory.EncodeStrand(job.Strand);
                 return await HttpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
                     new Result { StrandEncoded = encodedStrand });
             case "DecodeStrand":
-                var decodedStrand = LabModule.DecodeStrand(job.StrandEncoded);
+                var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded);
                 return await HttpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
                     new Result { Strand = decodedStrand });
             case "CheckGene":
-                var isActivated = LabModule.CheckGene(job.StrandEncoded, job.GeneEncoded);
+                var isActivated = _laboratory.CheckGene(job.StrandEncoded, job.GeneEncoded);
                 return await HttpService.SubmitCheckGeneAsync(_accessToken, job.Id,
                     new Result { IsActivated = isActivated });
             default:
