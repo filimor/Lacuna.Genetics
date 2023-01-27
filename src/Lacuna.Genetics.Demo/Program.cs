@@ -11,7 +11,7 @@ while (doJob)
     try
     {
         var response = jobsHandler.DoJobAsync().Result;
-        Console.WriteLine($"{response.Code}\t{response.Job?.Id}");
+        Console.WriteLine($"{response.Code}\t{response.Job?.Type}\t{response.Job?.Id}");
         Console.WriteLine(response.Message);
         Console.WriteLine();
     }

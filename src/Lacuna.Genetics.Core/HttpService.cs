@@ -44,7 +44,7 @@ public static class HttpService
     public static async Task<Response> SubmitCheckGeneAsync(string accessToken, string jobId, Result result)
     {
         var client = GetHttpClient(accessToken);
-        var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/check", result);
+        var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene", result);
         return await GetResponseContent(response);
     }
 
