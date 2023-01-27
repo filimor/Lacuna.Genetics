@@ -10,10 +10,34 @@ while (doJob)
 {
     try
     {
-        var response = jobsHandler.DoJobAsync().Result;
-        Console.WriteLine($"{response.Code}\t{response.Job?.Type}\t{response.Job?.Id}");
-        Console.WriteLine(response.Message);
-        Console.WriteLine();
+        var (response, result) = jobsHandler.DoJobAsync().Result;
+
+        Console.WriteLine($"JOB ID: {response.Job!.Id}\n");
+        Console.WriteLine($"JOB TYPE: {response.Job!.Type}");
+        Console.WriteLine($"JOB RESPONSE: {response.Code} {(!string.IsNullOrEmpty(response.Message) ? '-' : ' ')} {response.Message}");
+
+        Console.WriteLine(response.Job!.Type == "EncodeStrand"
+            ? $"STRAND:\n{response.Job?.Strand}"
+            : $"STRAND ENCODED:\n{response.Job?.StrandEncoded}");
+
+        if (response.Job!.Type == "CheckGene")
+        {
+            Console.WriteLine($"\nGENE ENCODED:\n{response.Job?.GeneEncoded}");
+        }
+
+        switch (response.Job!.Type)
+        {
+            case "DecodeStrand":
+                Console.WriteLine($"\nSTRAND:\n{result.Strand}\n");
+                break;
+            case "EncodeStrand":
+                Console.WriteLine($"\nSTRAND ENCODED:\n{result.StrandEncoded}\n");
+                break;
+            case "CheckGene":
+                Console.WriteLine($"\nIS ACTIVATED:\n{result.IsActivated}\n");
+                break;
+        }
+
     }
     catch (Exception e)
     {
@@ -24,6 +48,9 @@ while (doJob)
         Console.WriteLine();
     }
 
-    Console.WriteLine("Do another? (y/n)");
+    Console.Write("Do another job? (y/n) ");
     doJob = Console.ReadLine() == "y";
+    Console.WriteLine();
+    Console.WriteLine("-------------------------");
+    Console.WriteLine();
 }

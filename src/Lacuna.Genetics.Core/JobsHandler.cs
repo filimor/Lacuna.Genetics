@@ -5,11 +5,11 @@ namespace Lacuna.Genetics.Core;
 
 public class JobsHandler
 {
+    private readonly IHttpService _httpService;
+    private readonly ILaboratory _laboratory;
     private readonly User _user;
     private string _accessToken = string.Empty;
     private DateTime _accessTokenExpiration;
-    private readonly ILaboratory _laboratory;
-    private readonly IHttpService _httpService;
 
     // TODO: Allow user creation?
     public JobsHandler(User user, ILaboratory laboratory, IHttpService httpService)
@@ -20,11 +20,11 @@ public class JobsHandler
     }
 
     // TODO: Implement parallel processing of jobs
-    public async Task<Response> DoJobAsync()
+    public async Task<Tuple<Response, Result>> DoJobAsync()
     {
         var job = GetJob();
         var response = await HandleJobAsync(job);
-        response.Job = job;
+        response.Item1.Job = job;
         return response;
     }
 
@@ -34,24 +34,33 @@ public class JobsHandler
         return _httpService.RequestJobAsync(_accessToken).Result;
     }
 
-    public async Task<Response> HandleJobAsync(Job job)
+    public async Task<Tuple<Response, Result>> HandleJobAsync(Job job)
     {
+        Response response;
+        Result result;
+
         switch (job.Type)
         {
             case "EncodeStrand":
                 var encodedStrand = _laboratory.EncodeStrand(job.Strand);
-                return await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
-                    new Result { StrandEncoded = encodedStrand });
+                result = new Result { StrandEncoded = encodedStrand };
+                response = await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
+                    result);
+                return new Tuple<Response, Result>(response, result);
             case "DecodeStrand":
                 var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded);
-                return await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
-                    new Result { Strand = decodedStrand });
+                result = new Result { Strand = decodedStrand };
+                response = await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
+                    result);
+                return new Tuple<Response, Result>(response, result);
             case "CheckGene":
                 var isActivated = _laboratory.CheckGene(job.StrandEncoded, job.GeneEncoded);
-                return await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
-                    new Result { IsActivated = isActivated });
+                result = new Result { IsActivated = isActivated };
+                response = await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
+                    result);
+                return new Tuple<Response, Result>(response, result);
             default:
-                return null;
+                throw new Exception("Unknown job type");
         }
     }
 

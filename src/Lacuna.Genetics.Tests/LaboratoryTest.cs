@@ -50,14 +50,17 @@ public class LaboratoryTest
         result.Should().BeTrue();
     }
 
-    //[Theory]
-    //[ClassData(typeof(InactivatedGenesClassData))]
-    //public void CheckGene_OnInactivatedGene_ReturnFalse(string gene, string strand)
-    //{
-    //    //  Act
-    //    var result = Laboratory.CheckGene(strand, gene);
+    [Theory]
+    [ClassData(typeof(InactivatedGenesClassData))]
+    public void CheckGene_OnInactivatedGene_ReturnFalse(string gene, string strand)
+    {
+        // Arrange
+        var laboratory = new Laboratory();
+        
+        //  Act
+        var result = laboratory.CheckGene(strand, gene);
 
-    //    // Assert
-    //    result.Should().BeFalse();
-    //}
+        // Assert
+        result.Should().BeFalse();
+    }
 }
