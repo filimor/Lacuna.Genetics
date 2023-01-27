@@ -5,10 +5,9 @@ using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
 
-// TODO: Encapsulate the classes better
 public static class HttpService
 {
-    private static readonly HttpClient _client = new()
+    private static readonly HttpClient Client = new()
     {
         BaseAddress = new Uri("https://gene.lacuna.cc/")
     };
@@ -51,15 +50,15 @@ public static class HttpService
 
     private static HttpClient GetHttpClient(string accessToken = "")
     {
-        _client.DefaultRequestHeaders.Accept.Clear();
-        _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        Client.DefaultRequestHeaders.Accept.Clear();
+        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         if (accessToken != "")
         {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
-        return _client;
+        return Client;
     }
 
     private static async Task<Response> GetResponseContent(HttpResponseMessage response)
@@ -71,12 +70,10 @@ public static class HttpService
         }
 
         var responseContent = await response.Content.ReadFromJsonAsync<Response>();
-        if (responseContent.Code != "Success")
-        {
-            throw new ApiException(
+        
+        return responseContent.Code == "Success"
+            ? responseContent
+            : throw new ApiException(
                 $"Failed to get/submit data.\nCode: {responseContent.Code}\nMessage: {responseContent.Message}");
-        }
-
-        return responseContent;
     }
 }

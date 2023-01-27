@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Lacuna.Genetics.Core.Extensions;
 
 namespace Lacuna.Genetics.Core;
 
@@ -77,7 +78,7 @@ public static class LabModule
         var strand = DecodeStrand(strandEncoded);
         var gene = DecodeStrand(geneEncoded);
         var templateStrand = GetTemplateStrand(strand);
-        var lcs = FindLongestCommonSubstring(templateStrand, gene);
+        var lcs = templateStrand.FindLongestCommonSubstring(gene);
         var matchRate = (double)lcs.Length / gene.Length;
 
         return matchRate >= 0.5;
@@ -112,39 +113,5 @@ public static class LabModule
         }
 
         return outputStrand.ToString();
-    }
-
-    // TODO: Extract this method
-    private static string FindLongestCommonSubstring(string s1, string s2)
-    {
-        var m = s1.Length;
-        var n = s2.Length;
-        var longest = 0;
-        var lcs = string.Empty;
-        var table = new int[m, n];
-
-        for (var i = 0; i < m; i++)
-        {
-            for (var j = 0; j < n; j++)
-            {
-                if (s1[i] != s2[j])
-                {
-                    continue;
-                }
-
-                table[i, j] = i == 0 || j == 0 ? 1 : 1 + table[i - 1, j - 1];
-
-                if (table[i, j] <= longest)
-                {
-                    continue;
-                }
-
-                longest = table[i, j];
-                var start = i - table[i, j] + 1;
-                lcs = s1.Substring(start, longest);
-            }
-        }
-
-        return lcs;
     }
 }
