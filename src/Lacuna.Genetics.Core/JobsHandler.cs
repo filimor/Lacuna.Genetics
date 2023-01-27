@@ -15,7 +15,6 @@ public class JobsHandler
     private string _accessToken = string.Empty;
     private DateTime _accessTokenExpiration;
 
-    // TODO: Allow user creation?
     public JobsHandler(User user, ILaboratory laboratory, IHttpService httpService)
     {
         _user = user;
@@ -23,7 +22,6 @@ public class JobsHandler
         _httpService = httpService;
     }
 
-    // TODO: Implement parallel processing of jobs
     public async Task<Tuple<Response, Result>> DoJobAsync()
     {
         var job = GetJob();
