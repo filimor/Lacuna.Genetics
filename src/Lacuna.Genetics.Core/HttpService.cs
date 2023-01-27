@@ -13,7 +13,6 @@ public class HttpService : IHttpService
         BaseAddress = new Uri("https://gene.lacuna.cc/")
     };
 
-
     public async Task<string> RequestAccessTokenAsync(User user)
     {
         var client = GetHttpClient();
@@ -49,6 +48,12 @@ public class HttpService : IHttpService
         return await GetResponseContent(response);
     }
 
+    /// <summary>
+    ///     Get the HttpClient from the class, clear the headers and add the Accept and Authorization headers.
+    ///     It means to be used BEFORE each request.
+    /// </summary>
+    /// <param name="accessToken">The Access Token (optional).</param>
+    /// <returns>The HttpClient with the proper headers.</returns>
     private static HttpClient GetHttpClient(string accessToken = "")
     {
         Client.DefaultRequestHeaders.Accept.Clear();
@@ -62,6 +67,14 @@ public class HttpService : IHttpService
         return Client;
     }
 
+    /// <summary>
+    ///     Get the response of an HttpRequest and deserialize it to a Response object.
+    ///     It means to be used AFTER each request.
+    /// </summary>
+    /// <param name="response">The HttpResponseMessage object</param>
+    /// <returns></returns>
+    /// <exception cref="HttpException">Thrown if the response doesn't have a success code (200-299).</exception>
+    /// <exception cref="ApiException">Thrown if the 'Code' attribute of the response body isn't Success.</exception>
     private static async Task<Response> GetResponseContent(HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode)

@@ -6,6 +6,11 @@ namespace Lacuna.Genetics.Core;
 
 public class Laboratory : ILaboratory
 {
+    /// <summary>
+    ///    Decode a strand from the Base64 to the String format.
+    /// </summary>
+    /// <param name="strand">A Strand in the Base64 format.</param>
+    /// <returns>The strand in the String format.</returns>
     public string DecodeStrand(string strand)
     {
         var encodedBytes = Convert.FromBase64String(strand);
@@ -41,6 +46,11 @@ public class Laboratory : ILaboratory
         return decodedStrand.ToString();
     }
 
+    /// <summary>
+    ///    Encode a strand from the String to the Base64 format.
+    /// </summary>
+    /// <param name="strand">A strand in the String format.</param>
+    /// <returns>The strand in the Base64 format.</returns>
     public string EncodeStrand(string strand)
     {
         var sb = new StringBuilder();
@@ -74,6 +84,13 @@ public class Laboratory : ILaboratory
         return Convert.ToBase64String(byteArray);
     }
 
+    /// <summary>
+    ///     Check whether a gene is activated (if more than 50% of the gene
+    ///     is present on the template strand.).
+    /// </summary>
+    /// <param name="strandEncoded">A strand in the Base64 format.</param>
+    /// <param name="geneEncoded">A gene in the Base64 format.</param>
+    /// <returns></returns>
     public bool CheckGene(string strandEncoded, string geneEncoded)
     {
         var strand = DecodeStrand(strandEncoded);
@@ -85,6 +102,12 @@ public class Laboratory : ILaboratory
         return matchRate >= 0.5;
     }
 
+    /// <summary>
+    ///     Returns the same strand if it is a template strand,
+    ///     otherwise returns the complementary strand.
+    /// </summary>
+    /// <param name="inputStrand">A strand in the String format.</param>
+    /// <returns>The corresponding template strand.</returns>
     private static string GetTemplateStrand(string inputStrand)
     {
         if (inputStrand.StartsWith("CAT"))
