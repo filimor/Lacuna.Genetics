@@ -5,6 +5,10 @@ namespace Lacuna.Genetics.Core;
 
 public class JobsHandler
 {
+    public const string JobTypeEncodeStrand = "EncodeStrand";
+    public const string JobTypeDecodeStrand = "DecodeStrand";
+    public const string JobTypeCheckGene = "CheckGene";
+
     private readonly IHttpService _httpService;
     private readonly ILaboratory _laboratory;
     private readonly User _user;
@@ -28,7 +32,7 @@ public class JobsHandler
         return response;
     }
 
-    public Job? GetJob()
+    public Job GetJob()
     {
         RefreshAccessToken();
         return _httpService.RequestJobAsync(_accessToken).Result;
@@ -41,20 +45,20 @@ public class JobsHandler
 
         switch (job.Type)
         {
-            case "EncodeStrand":
-                var encodedStrand = _laboratory.EncodeStrand(job.Strand);
+            case JobTypeEncodeStrand:
+                var encodedStrand = _laboratory.EncodeStrand(job.Strand!);
                 result = new Result { StrandEncoded = encodedStrand };
                 response = await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
-            case "DecodeStrand":
-                var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded);
+            case JobTypeDecodeStrand:
+                var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded!);
                 result = new Result { Strand = decodedStrand };
                 response = await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
-            case "CheckGene":
-                var isActivated = _laboratory.CheckGene(job.StrandEncoded, job.GeneEncoded);
+            case JobTypeCheckGene:
+                var isActivated = _laboratory.CheckGene(job.StrandEncoded!, job.GeneEncoded!);
                 result = new Result { IsActivated = isActivated };
                 response = await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
                     result);

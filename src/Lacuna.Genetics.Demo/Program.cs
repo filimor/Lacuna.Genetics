@@ -12,39 +12,36 @@ while (doJob)
     {
         var (response, result) = jobsHandler.DoJobAsync().Result;
 
-        Console.WriteLine($"JOB ID: {response.Job!.Id}\n");
+        Console.WriteLine($"JOB ID: {response.Job!.Id}");
         Console.WriteLine($"JOB TYPE: {response.Job!.Type}");
-        Console.WriteLine($"JOB RESPONSE: {response.Code} {(!string.IsNullOrEmpty(response.Message) ? '-' : ' ')} {response.Message}");
+        Console.WriteLine(
+            $"JOB RESPONSE: {response.Code} {(!string.IsNullOrEmpty(response.Message) ? '-' : ' ')} {response.Message}\n");
 
-        Console.WriteLine(response.Job!.Type == "EncodeStrand"
+        Console.WriteLine(response.Job!.Type == JobsHandler.JobTypeEncodeStrand
             ? $"STRAND:\n{response.Job?.Strand}"
             : $"STRAND ENCODED:\n{response.Job?.StrandEncoded}");
 
-        if (response.Job!.Type == "CheckGene")
+        if (response.Job!.Type == JobsHandler.JobTypeCheckGene)
         {
             Console.WriteLine($"\nGENE ENCODED:\n{response.Job?.GeneEncoded}");
         }
 
         switch (response.Job!.Type)
         {
-            case "DecodeStrand":
+            case JobsHandler.JobTypeDecodeStrand:
                 Console.WriteLine($"\nSTRAND:\n{result.Strand}\n");
                 break;
-            case "EncodeStrand":
+            case JobsHandler.JobTypeEncodeStrand:
                 Console.WriteLine($"\nSTRAND ENCODED:\n{result.StrandEncoded}\n");
                 break;
-            case "CheckGene":
+            case JobsHandler.JobTypeCheckGene:
                 Console.WriteLine($"\nIS ACTIVATED:\n{result.IsActivated}\n");
                 break;
         }
-
     }
     catch (Exception e)
     {
         Console.WriteLine(e.Message);
-        Console.WriteLine(e.InnerException?.Message);
-        Console.WriteLine(e.StackTrace);
-        Console.WriteLine(e.Source);
         Console.WriteLine();
     }
 

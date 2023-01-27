@@ -13,7 +13,7 @@ public class LaboratoryTest
     {
         // Arrange
         var laboratory = new Laboratory();
-        
+
         // Act
         var decodedStrand = laboratory.DecodeStrand(encodedStrand);
 
@@ -27,7 +27,7 @@ public class LaboratoryTest
     {
         // Arrange
         var laboratory = new Laboratory();
-        
+
         // Act
         var decodedStrand = laboratory.EncodeStrand(encodedStrand);
 
@@ -42,7 +42,7 @@ public class LaboratoryTest
     {
         // Arrange
         var laboratory = new Laboratory();
-        
+
         // Act
         var result = laboratory.CheckGene(strand, gene);
 
@@ -56,7 +56,7 @@ public class LaboratoryTest
     {
         // Arrange
         var laboratory = new Laboratory();
-        
+
         //  Act
         var result = laboratory.CheckGene(strand, gene);
 

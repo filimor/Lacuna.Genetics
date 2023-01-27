@@ -6,7 +6,7 @@ using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
 
-public class HttpService:IHttpService
+public class HttpService : IHttpService
 {
     private static readonly HttpClient Client = new()
     {
@@ -14,18 +14,18 @@ public class HttpService:IHttpService
     };
 
 
-    public async Task<string?> RequestAccessTokenAsync(User user)
+    public async Task<string> RequestAccessTokenAsync(User user)
     {
         var client = GetHttpClient();
         var response = await client.PostAsJsonAsync("api/users/login", user);
-        return GetResponseContent(response).Result.AccessToken;
+        return GetResponseContent(response).Result.AccessToken!;
     }
 
-    public async Task<Job?> RequestJobAsync(string accessToken)
+    public async Task<Job> RequestJobAsync(string accessToken)
     {
         var client = GetHttpClient(accessToken);
         var response = await client.GetAsync("api/dna/jobs");
-        return GetResponseContent(response).Result.Job;
+        return GetResponseContent(response).Result.Job!;
     }
 
     public async Task<Response> SubmitEncodeStrandAsync(string accessToken, string jobId, Result result)
@@ -71,8 +71,8 @@ public class HttpService:IHttpService
         }
 
         var responseContent = await response.Content.ReadFromJsonAsync<Response>();
-        
-        return responseContent.Code == "Success"
+
+        return responseContent!.Code == "Success"
             ? responseContent
             : throw new ApiException(
                 $"Failed to get/submit data.\nCode: {responseContent.Code}\nMessage: {responseContent.Message}");

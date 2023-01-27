@@ -2,8 +2,8 @@
 
 public class Response
 {
-    public string Code { get; set; }
-    public string Message { get; set; }
+    public string Code { get; set; } = default!;
+    public string Message { get; set; } = default!;
     public string? AccessToken { get; set; }
     public Job? Job { get; set; }
 }
