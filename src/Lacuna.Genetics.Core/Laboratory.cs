@@ -43,7 +43,7 @@ public class Laboratory : ILaboratory
     /// <returns>The strand in the String format.</returns>
     public string DecodeStrand(string strand)
     {
-        var encodingDict = new Dictionary<byte, char>
+        var decodingDict = new Dictionary<byte, char>
         {
             { 0b00, 'A' },
             { 0b01, 'C' },
@@ -56,10 +56,10 @@ public class Laboratory : ILaboratory
 
         foreach (var encodedByte in byteArray)
         {
-            stringBuilder.Append(encodingDict[Convert.ToByte(encodedByte >> 6)]);
-            stringBuilder.Append(encodingDict[Convert.ToByte((encodedByte >> 4) & 0b11)]);
-            stringBuilder.Append(encodingDict[Convert.ToByte((encodedByte >> 2) & 0b11)]);
-            stringBuilder.Append(encodingDict[Convert.ToByte(encodedByte & 0b11)]);
+            stringBuilder.Append(decodingDict[Convert.ToByte(encodedByte >> 6)]);
+            stringBuilder.Append(decodingDict[Convert.ToByte((encodedByte >> 4) & 0b11)]);
+            stringBuilder.Append(decodingDict[Convert.ToByte((encodedByte >> 2) & 0b11)]);
+            stringBuilder.Append(decodingDict[Convert.ToByte(encodedByte & 0b11)]);
         }
 
         return stringBuilder.ToString();
@@ -96,27 +96,21 @@ public class Laboratory : ILaboratory
             return inputStrand;
         }
 
-        var outputStrand = new StringBuilder();
-
-        foreach (var c in inputStrand)
+        var translationDict = new Dictionary<char, char>
         {
-            switch (c)
-            {
-                case 'A':
-                    outputStrand.Append('T');
-                    break;
-                case 'T':
-                    outputStrand.Append('A');
-                    break;
-                case 'C':
-                    outputStrand.Append('G');
-                    break;
-                case 'G':
-                    outputStrand.Append('C');
-                    break;
-            }
+            { 'A', 'T' },
+            { 'C', 'G' },
+            { 'G', 'C' },
+            { 'T', 'A' }
+        };
+
+        var sb = new StringBuilder();
+
+        foreach (var nucleotide in inputStrand)
+        {
+            sb.Append(translationDict[nucleotide]);
         }
 
-        return outputStrand.ToString();
+        return sb.ToString();
     }
 }

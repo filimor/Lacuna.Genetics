@@ -19,7 +19,9 @@ public static class StringExtensions
                     continue;
                 }
 
-                table[i, j] = i == 0 || j == 0 ? 1 : 1 + table[i - 1, j - 1];
+                table[i, j] = i == 0 || j == 0 
+                    ? 1 
+                    : 1 + table[i - 1, j - 1];
 
                 if (table[i, j] <= longest)
                 {
