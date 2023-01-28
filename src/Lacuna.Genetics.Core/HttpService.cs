@@ -15,36 +15,36 @@ public class HttpService : IHttpService
 
     public async Task<string> RequestAccessTokenAsync(User user)
     {
-        var client = GetHttpClient();
-        var response = await client.PostAsJsonAsync("api/users/login", user);
+        GetHttpClient();
+        var response = await Client.PostAsJsonAsync("api/users/login", user);
         return GetResponseContent(response).Result.AccessToken!;
     }
 
     public async Task<Job> RequestJobAsync(string accessToken)
     {
-        var client = GetHttpClient(accessToken);
-        var response = await client.GetAsync("api/dna/jobs");
+       GetHttpClient(accessToken);
+        var response = await Client.GetAsync("api/dna/jobs");
         return GetResponseContent(response).Result.Job!;
     }
 
     public async Task<Response> SubmitEncodeStrandAsync(string accessToken, string jobId, Result result)
     {
-        var client = GetHttpClient(accessToken);
-        var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode", result);
+        GetHttpClient(accessToken);
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode", result);
         return await GetResponseContent(response);
     }
 
     public async Task<Response> SubmitDecodeStrandAsync(string accessToken, string jobId, Result result)
     {
-        var client = GetHttpClient(accessToken);
-        var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode", result);
+        GetHttpClient(accessToken);
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode", result);
         return await GetResponseContent(response);
     }
 
     public async Task<Response> SubmitCheckGeneAsync(string accessToken, string jobId, Result result)
     {
-        var client = GetHttpClient(accessToken);
-        var response = await client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene", result);
+        GetHttpClient(accessToken);
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene", result);
         return await GetResponseContent(response);
     }
 
@@ -52,12 +52,10 @@ public class HttpService : IHttpService
     ///     Get the HttpClient from the class, clear the headers and add the Accept headers.
     ///     It means to be used BEFORE each request.
     /// </summary>
-    /// <returns>The HttpClient with the proper headers.</returns>
-    private static HttpClient GetHttpClient()
+    private static void GetHttpClient()
     {
         Client.DefaultRequestHeaders.Accept.Clear();
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        return Client;
     }
 
     /// <summary>
@@ -65,12 +63,10 @@ public class HttpService : IHttpService
     ///     It means to be used BEFORE each request.
     /// </summary>
     /// <param name="accessToken">The Access Token.</param>
-    /// <returns>The HttpClient with the proper headers.</returns>
-    private static HttpClient GetHttpClient(string accessToken)
+    private static void GetHttpClient(string accessToken)
     {
-        var client = GetHttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        return client;
+        GetHttpClient();
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     }
 
     /// <summary>
