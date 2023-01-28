@@ -49,22 +49,28 @@ public class HttpService : IHttpService
     }
 
     /// <summary>
-    ///     Get the HttpClient from the class, clear the headers and add the Accept and Authorization headers.
+    ///     Get the HttpClient from the class, clear the headers and add the Accept headers.
     ///     It means to be used BEFORE each request.
     /// </summary>
-    /// <param name="accessToken">The Access Token (optional).</param>
     /// <returns>The HttpClient with the proper headers.</returns>
-    private static HttpClient GetHttpClient(string accessToken = "")
+    private static HttpClient GetHttpClient()
     {
         Client.DefaultRequestHeaders.Accept.Clear();
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        if (accessToken != "")
-        {
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        }
-
         return Client;
+    }
+
+    /// <summary>
+    ///     Get the HttpClient from the class, clear the headers and add the Accept and Authorization headers.
+    ///     It means to be used BEFORE each request.
+    /// </summary>
+    /// <param name="accessToken">The Access Token.</param>
+    /// <returns>The HttpClient with the proper headers.</returns>
+    private static HttpClient GetHttpClient(string accessToken)
+    {
+        var client = GetHttpClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        return client;
     }
 
     /// <summary>
@@ -79,15 +85,13 @@ public class HttpService : IHttpService
     {
         if (!response.IsSuccessStatusCode)
         {
-            throw new HttpException(
-                $"Failed to send the request.\nStatus code: {response.StatusCode}\nResponse: {response.Content.ReadAsStringAsync().Result}\n");
+            throw new HttpException(response.StatusCode, response.Content.ReadAsStringAsync().Result);
         }
 
         var responseContent = await response.Content.ReadFromJsonAsync<Response>();
 
-        return responseContent!.Code == "Success"
+        return responseContent!.Code == Response.SuccessCode
             ? responseContent
-            : throw new ApiException(
-                $"Failed to get/submit data.\nCode: {responseContent.Code}\nMessage: {responseContent.Message}");
+            : throw new ApiException(responseContent.Code, responseContent.Message);
     }
 }

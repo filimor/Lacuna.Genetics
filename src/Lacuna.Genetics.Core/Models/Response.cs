@@ -1,9 +1,9 @@
-﻿using System.Text;
-
-namespace Lacuna.Genetics.Core.Models;
+﻿namespace Lacuna.Genetics.Core.Models;
 
 public class Response
 {
+    [NonSerialized] public static readonly string SuccessCode = "Success";
+
     public string Code { get; set; } = default!;
     public string Message { get; set; } = default!;
     public string? AccessToken { get; set; }
