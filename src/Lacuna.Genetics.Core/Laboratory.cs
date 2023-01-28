@@ -7,81 +7,62 @@ namespace Lacuna.Genetics.Core;
 public class Laboratory : ILaboratory
 {
     /// <summary>
-    ///    Decode a strand from the Base64 to the String format.
-    /// </summary>
-    /// <param name="strand">A Strand in the Base64 format.</param>
-    /// <returns>The strand in the String format.</returns>
-    public string DecodeStrand(string strand)
-    {
-        var encodedBytes = Convert.FromBase64String(strand);
-        var encodedBits = new StringBuilder();
-
-        foreach (var encodedByte in encodedBytes)
-        {
-            encodedBits.Append(Convert.ToString(encodedByte, 2).PadLeft(8, '0'));
-        }
-
-        var decodedStrand = new StringBuilder();
-
-        for (var i = 0; i < encodedBits.Length; i += 2)
-        {
-            var bit = encodedBits.ToString(i, 2);
-            switch (bit)
-            {
-                case "00":
-                    decodedStrand.Append('A');
-                    break;
-                case "01":
-                    decodedStrand.Append('C');
-                    break;
-                case "10":
-                    decodedStrand.Append('G');
-                    break;
-                case "11":
-                    decodedStrand.Append('T');
-                    break;
-            }
-        }
-
-        return decodedStrand.ToString();
-    }
-
-    /// <summary>
-    ///    Encode a strand from the String to the Base64 format.
+    ///     Encode a strand from the String to the Base64 format.
     /// </summary>
     /// <param name="strand">A strand in the String format.</param>
     /// <returns>The strand in the Base64 format.</returns>
     public string EncodeStrand(string strand)
     {
-        var sb = new StringBuilder();
-
-        foreach (var c in strand)
+        var encodingDict = new Dictionary<char, byte>
         {
-            switch (c)
-            {
-                case 'A':
-                    sb.Append("00");
-                    break;
-                case 'C':
-                    sb.Append("01");
-                    break;
-                case 'G':
-                    sb.Append("10");
-                    break;
-                case 'T':
-                    sb.Append("11");
-                    break;
-            }
-        }
+            { 'A', 0b00 },
+            { 'C', 0b01 },
+            { 'G', 0b10 },
+            { 'T', 0b11 }
+        };
 
-        var byteArray = new byte[sb.Length / 8];
+        var byteArray = new byte[strand.Length / 4];
 
-        for (var i = 0; i < sb.Length; i += 8)
+        for (var i = 0; i < strand.Length; i += 4)
         {
-            byteArray[i / 8] = Convert.ToByte(sb.ToString().Substring(i, 8), 2);
+            var bit = strand.Substring(i, 4);
+            var encodedByte = (byte)((encodingDict[bit[0]] << 6) |
+                                     (encodingDict[bit[1]] << 4) |
+                                     (encodingDict[bit[2]] << 2) |
+                                     encodingDict[bit[3]]);
+            byteArray[i / 4] = encodedByte;
         }
 
         return Convert.ToBase64String(byteArray);
+    }
+
+    /// <summary>
+    ///     Decode a strand from the Base64 to the String format.
+    /// </summary>
+    /// <param name="strand">A Strand in the Base64 format.</param>
+    /// <returns>The strand in the String format.</returns>
+    public string DecodeStrand(string strand)
+    {
+        var encodingDict = new Dictionary<byte, char>
+        {
+            { 0b00, 'A' },
+            { 0b01, 'C' },
+            { 0b10, 'G' },
+            { 0b11, 'T' }
+        };
+
+        var byteArray = Convert.FromBase64String(strand);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var encodedByte in byteArray)
+        {
+            stringBuilder.Append(encodingDict[Convert.ToByte(encodedByte >> 6)]);
+            stringBuilder.Append(encodingDict[Convert.ToByte((encodedByte >> 4) & 0b11)]);
+            stringBuilder.Append(encodingDict[Convert.ToByte((encodedByte >> 2) & 0b11)]);
+            stringBuilder.Append(encodingDict[Convert.ToByte(encodedByte & 0b11)]);
+        }
+
+        return stringBuilder.ToString();
     }
 
     /// <summary>
