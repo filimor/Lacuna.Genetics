@@ -5,10 +5,6 @@ namespace Lacuna.Genetics.Core;
 
 public class JobsHandler
 {
-    public const string JobTypeEncodeStrand = "EncodeStrand";
-    public const string JobTypeDecodeStrand = "DecodeStrand";
-    public const string JobTypeCheckGene = "CheckGene";
-
     private readonly IHttpService _httpService;
     private readonly ILaboratory _laboratory;
     private readonly User _user;
@@ -58,19 +54,19 @@ public class JobsHandler
 
         switch (job.Type)
         {
-            case JobTypeEncodeStrand:
+            case JobType.EncodeStrand:
                 var encodedStrand = _laboratory.EncodeStrand(job.Strand!);
                 result = new Result { StrandEncoded = encodedStrand };
                 response = await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
-            case JobTypeDecodeStrand:
+            case JobType.DecodeStrand:
                 var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded!);
                 result = new Result { Strand = decodedStrand };
                 response = await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
-            case JobTypeCheckGene:
+            case JobType.CheckGene:
                 var isActivated = _laboratory.CheckGene(job.StrandEncoded!, job.GeneEncoded!);
                 result = new Result { IsActivated = isActivated };
                 response = await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
