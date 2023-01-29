@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Lacuna.Genetics.Core.Exceptions;
 using Lacuna.Genetics.Core.Interfaces;
 using Lacuna.Genetics.Core.Models;
@@ -10,41 +12,51 @@ public class HttpService : IHttpService
 {
     private static readonly HttpClient Client = new()
     {
-        //BaseAddress = new Uri("https://gene.lacuna.cc/")
+        BaseAddress = new Uri("https://gene.lacuna.cc/")
     };
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
 
     public async Task<string> RequestAccessTokenAsync(User user)
     {
         GetHttpClient();
-        var response = await Client.PostAsJsonAsync("https://gene.lacuna.cc/api/users/login", user);
+        var response = await Client.PostAsJsonAsync("api/users/login", user);
         return GetResponseContent(response).Result.AccessToken!;
     }
 
     public async Task<Job> RequestJobAsync(string accessToken)
     {
-       GetHttpClient(accessToken);
-        var response = await Client.GetAsync("https://gene.lacuna.cc/api/dna/jobs");
+        GetHttpClient(accessToken);
+        var response = await Client.GetAsync("api/dna/jobs");
         return GetResponseContent(response).Result.Job!;
     }
 
     public async Task<Response> SubmitEncodeStrandAsync(string accessToken, string jobId, Result result)
     {
         GetHttpClient(accessToken);
-        var response = await Client.PostAsJsonAsync($"https://webhook.site/910dddac-2e87-4964-94fd-3eb9d6a56708/", result);
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode",
+            result, JsonOptions);
         return await GetResponseContent(response);
     }
 
     public async Task<Response> SubmitDecodeStrandAsync(string accessToken, string jobId, Result result)
     {
         GetHttpClient(accessToken);
-        var response = await Client.PostAsJsonAsync($"https://webhook.site/910dddac-2e87-4964-94fd-3eb9d6a56708/", result);
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode",
+            result, JsonOptions);
         return await GetResponseContent(response);
     }
 
     public async Task<Response> SubmitCheckGeneAsync(string accessToken, string jobId, Result result)
     {
         GetHttpClient(accessToken);
-        var response = await Client.PostAsJsonAsync($"https://webhook.site/910dddac-2e87-4964-94fd-3eb9d6a56708/", result);
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene",
+            result, JsonOptions);
         return await GetResponseContent(response);
     }
 
