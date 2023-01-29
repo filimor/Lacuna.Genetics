@@ -1,7 +1,7 @@
 ﻿namespace Lacuna.Genetics.Core.Exceptions;
 
 /// <summary>
-/// The ApiException is thrown when the API doesn't return a 'Success' code in the response body.
+///     The ApiException is thrown when the API doesn't return a 'Success' code in the response body.
 /// </summary>
 public class ApiException : Exception
 {

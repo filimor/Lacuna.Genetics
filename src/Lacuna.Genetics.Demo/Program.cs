@@ -9,7 +9,7 @@ while (doJob)
 {
     try
     {
-        var (response, result) = jobsHandler.DoJobAsync().Result;
+        var (response, result) = jobsHandler.DoJob();
 
         Console.WriteLine(response);
         Console.WriteLine(result);

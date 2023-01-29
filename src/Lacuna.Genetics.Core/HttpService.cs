@@ -42,10 +42,16 @@ public class HttpService : IHttpService
         return GetResponseContent(response).Result.Job!;
     }
 
-    public async Task<Response> SubmitJobAsync(string jobId, string endpoint, Result result)
+    /// <summary>
+    ///     Send the result of a job to the server.
+    /// </summary>
+    /// <param name="endpoint">The endpoint to send the result.</param>
+    /// <param name="result">The Result object with the parameters to send.</param>
+    /// <returns>The response gotten.</returns>
+    public async Task<Response> SubmitJobAsync(string endpoint, Result result)
     {
         await GetAuthorization();
-        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/{endpoint}",
+        var response = await Client.PostAsJsonAsync(endpoint,
             result, JsonOptions);
         return await GetResponseContent(response);
     }

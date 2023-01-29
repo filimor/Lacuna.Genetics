@@ -52,7 +52,7 @@ public class Laboratory : ILaboratory
         {
             return null;
         }
-        
+
         var decodingDict = new Dictionary<byte, char>
         {
             { 0b00, 'A' },
