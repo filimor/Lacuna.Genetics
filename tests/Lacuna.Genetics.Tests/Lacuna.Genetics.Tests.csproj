@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lacuna.Genetics.Core\Lacuna.Genetics.Core.csproj" />
+    <ProjectReference Include="..\..\src\Lacuna.Genetics.Core\Lacuna.Genetics.Core.csproj" />
   </ItemGroup>
 
 </Project>

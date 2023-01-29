@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lacuna.Genetics.Core", "Lac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lacuna.Genetics.Demo", "Lacuna.Genetics.Demo\Lacuna.Genetics.Demo.csproj", "{83DB6E6E-2CD1-41DE-8B8A-2E2C1FD071A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lacuna.Genetics.Tests", "Lacuna.Genetics.Tests\Lacuna.Genetics.Tests.csproj", "{4A3F71F7-27D0-47B6-B13B-8F8AAF5B643E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lacuna.Genetics.Tests", "..\tests\Lacuna.Genetics.Tests\Lacuna.Genetics.Tests.csproj", "{4A3F71F7-27D0-47B6-B13B-8F8AAF5B643E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
