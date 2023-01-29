@@ -7,13 +7,9 @@ public class JobsHandler
 {
     private readonly IHttpService _httpService;
     private readonly ILaboratory _laboratory;
-    private readonly User _user;
-    private string _accessToken = string.Empty;
-    private DateTime _accessTokenExpiration;
 
-    public JobsHandler(User user, ILaboratory laboratory, IHttpService httpService)
+    public JobsHandler(ILaboratory laboratory, IHttpService httpService)
     {
-        _user = user;
         _laboratory = laboratory;
         _httpService = httpService;
     }
@@ -36,8 +32,7 @@ public class JobsHandler
     /// <returns>The job retrieved.</returns>
     private Job GetJob()
     {
-        RefreshAccessToken();
-        return _httpService.RequestJobAsync(_accessToken).Result;
+        return _httpService.RequestJobAsync().Result;
     }
 
     /// <summary>
@@ -57,37 +52,23 @@ public class JobsHandler
             case JobType.EncodeStrand:
                 var encodedStrand = _laboratory.EncodeStrand(job.Strand!);
                 result = new Result { StrandEncoded = encodedStrand };
-                response = await _httpService.SubmitEncodeStrandAsync(_accessToken, job.Id,
+                response = await _httpService.SubmitEncodeStrandAsync(job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
             case JobType.DecodeStrand:
                 var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded!);
                 result = new Result { Strand = decodedStrand };
-                response = await _httpService.SubmitDecodeStrandAsync(_accessToken, job.Id,
+                response = await _httpService.SubmitDecodeStrandAsync(job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
             case JobType.CheckGene:
                 var isActivated = _laboratory.CheckGene(job.StrandEncoded!, job.GeneEncoded!);
                 result = new Result { IsActivated = isActivated };
-                response = await _httpService.SubmitCheckGeneAsync(_accessToken, job.Id,
+                response = await _httpService.SubmitCheckGeneAsync(job.Id,
                     result);
                 return new Tuple<Response, Result>(response, result);
             default:
                 throw new Exception("Unknown job type");
         }
-    }
-
-    /// <summary>
-    ///     Get a new Access Token if the current one is empty or expired.
-    /// </summary>
-    private void RefreshAccessToken()
-    {
-        if (!string.IsNullOrEmpty(_accessToken) && _accessTokenExpiration >= DateTime.Now)
-        {
-            return;
-        }
-
-        _accessToken = _httpService.RequestAccessTokenAsync(_user).Result;
-        _accessTokenExpiration = DateTime.Now.AddMinutes(2);
     }
 }

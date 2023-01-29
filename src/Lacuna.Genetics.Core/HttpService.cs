@@ -21,64 +21,78 @@ public class HttpService : IHttpService
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
+    private static string _accessToken = string.Empty;
+    private static DateTime _accessTokenExpiration;
 
-    public async Task<string> RequestAccessTokenAsync(User user)
+    private readonly User _user;
+
+    public HttpService(User user)
     {
-        GetHttpClient();
-        var response = await Client.PostAsJsonAsync("api/users/login", user);
-        return GetResponseContent(response).Result.AccessToken!;
+        _user = user;
     }
 
-    public async Task<Job> RequestJobAsync(string accessToken)
+    public async Task<Job> RequestJobAsync()
     {
-        GetHttpClient(accessToken);
+        await GetHttpClient(true);
         var response = await Client.GetAsync("api/dna/jobs");
         return GetResponseContent(response).Result.Job!;
     }
 
-    public async Task<Response> SubmitEncodeStrandAsync(string accessToken, string jobId, Result result)
+    public async Task<Response> SubmitEncodeStrandAsync(string jobId, Result result)
     {
-        GetHttpClient(accessToken);
+        await GetHttpClient(true);
         var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode",
             result, JsonOptions);
         return await GetResponseContent(response);
     }
 
-    public async Task<Response> SubmitDecodeStrandAsync(string accessToken, string jobId, Result result)
+    public async Task<Response> SubmitDecodeStrandAsync(string jobId, Result result)
     {
-        GetHttpClient(accessToken);
+        await GetHttpClient(true);
         var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode",
             result, JsonOptions);
         return await GetResponseContent(response);
     }
 
-    public async Task<Response> SubmitCheckGeneAsync(string accessToken, string jobId, Result result)
+    public async Task<Response> SubmitCheckGeneAsync(string jobId, Result result)
     {
-        GetHttpClient(accessToken);
+        await GetHttpClient(true);
         var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene",
             result, JsonOptions);
         return await GetResponseContent(response);
     }
 
     /// <summary>
-    ///     Get the HttpClient from the class, clear the headers and add the Accept headers.
-    ///     It means to be used BEFORE each request.
+    ///     Get a new Access Token if the current one is empty or expired.
     /// </summary>
-    private static void GetHttpClient()
+    private async Task RefreshTokenAsync()
     {
-        Client.DefaultRequestHeaders.Accept.Clear();
-        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        if (!string.IsNullOrEmpty(_accessToken) && _accessTokenExpiration >= DateTime.Now)
+        {
+            return;
+        }
+
+        await GetHttpClient(false);
+        var response = await Client.PostAsJsonAsync("api/users/login", _user);
+        _accessToken = GetResponseContent(response).Result.AccessToken!;
+        _accessTokenExpiration = DateTime.Now.AddMinutes(2);
     }
 
     /// <summary>
     ///     Get the HttpClient from the class, clear the headers and add the Accept and Authorization headers.
     ///     It means to be used BEFORE each request.
     /// </summary>
-    /// <param name="accessToken">The Access Token.</param>
-    private static void GetHttpClient(string accessToken)
+    /// <param name="authorize">Whether the Authorization header is needed.</param>
+    private async Task GetHttpClient(bool authorize)
     {
-        GetHttpClient();
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        Client.DefaultRequestHeaders.Accept.Clear();
+        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        if (authorize)
+        {
+            await RefreshTokenAsync();
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+        }
     }
 
     /// <summary>

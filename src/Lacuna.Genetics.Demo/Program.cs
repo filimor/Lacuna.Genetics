@@ -2,7 +2,7 @@
 using Lacuna.Genetics.Core.Models;
 
 var user = new User("filimor", "zkdvz3dA3!nBJcn94y**");
-var jobsHandler = new JobsHandler(user, new Laboratory(), new HttpService());
+var jobsHandler = new JobsHandler(new Laboratory(), new HttpService(user));
 var doJob = true;
 
 while (doJob)
