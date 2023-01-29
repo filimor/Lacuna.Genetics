@@ -1,4 +1,5 @@
-﻿using Lacuna.Genetics.Core.Interfaces;
+﻿using System.Net;
+using Lacuna.Genetics.Core.Interfaces;
 using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
@@ -44,33 +45,18 @@ public class JobsHandler
     /// <exception cref="Exception">Thrown if the job type is unknown.</exception>
     private async Task<Tuple<Response, Result>> HandleJobAsync(Job job)
     {
-        Response response;
-        Result result;
+        var encodedStrand = _laboratory.EncodeStrand(job.Strand!);
+        var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded!);
+        var isActivated = _laboratory.CheckGene(job.StrandEncoded!, job.GeneEncoded!);
 
-        switch (job.Type)
+        var result = new Result
         {
-            case JobType.EncodeStrand:
-                var encodedStrand = _laboratory.EncodeStrand(job.Strand!);
-                result = new Result { StrandEncoded = encodedStrand };
-                response = await _httpService.SubmitEncodeStrandAsync(job.Id,
-                    result);
-                break;
-            case JobType.DecodeStrand:
-                var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded!);
-                result = new Result { Strand = decodedStrand };
-                response = await _httpService.SubmitDecodeStrandAsync(job.Id,
-                    result);
-                break;
-            case JobType.CheckGene:
-                var isActivated = _laboratory.CheckGene(job.StrandEncoded!, job.GeneEncoded!);
-                result = new Result { IsActivated = isActivated };
-                response = await _httpService.SubmitCheckGeneAsync(job.Id,
-                    result);
-                break;
-            default:
-                throw new Exception("Unknown job type");
-        }
+            StrandEncoded = encodedStrand,
+            Strand = decodedStrand,
+            IsActivated = isActivated,
+        };
 
+        var response = await _httpService.SubmitJobAsync(job.Id, JobType.GetEndpoint(job.Type), result);
         return new Tuple<Response, Result>(response, result);
     }
 }

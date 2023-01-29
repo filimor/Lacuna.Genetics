@@ -11,8 +11,13 @@ public class Laboratory : ILaboratory
     /// </summary>
     /// <param name="strand">A strand in the String format.</param>
     /// <returns>The strand in the Base64 format.</returns>
-    public string EncodeStrand(string strand)
+    public string? EncodeStrand(string strand)
     {
+        if (string.IsNullOrEmpty(strand))
+        {
+            return null;
+        }
+
         var encodingDict = new Dictionary<char, byte>
         {
             { 'A', 0b00 },
@@ -41,8 +46,13 @@ public class Laboratory : ILaboratory
     /// </summary>
     /// <param name="strand">A Strand in the Base64 format.</param>
     /// <returns>The strand in the String format.</returns>
-    public string DecodeStrand(string strand)
+    public string? DecodeStrand(string strand)
     {
+        if (string.IsNullOrEmpty(strand))
+        {
+            return null;
+        }
+        
         var decodingDict = new Dictionary<byte, char>
         {
             { 0b00, 'A' },
@@ -72,13 +82,18 @@ public class Laboratory : ILaboratory
     /// <param name="strandEncoded">A strand in the Base64 format.</param>
     /// <param name="geneEncoded">A gene in the Base64 format.</param>
     /// <returns></returns>
-    public bool CheckGene(string strandEncoded, string geneEncoded)
+    public bool? CheckGene(string strandEncoded, string geneEncoded)
     {
+        if (string.IsNullOrEmpty(strandEncoded) || string.IsNullOrEmpty(geneEncoded))
+        {
+            return null;
+        }
+
         var strand = DecodeStrand(strandEncoded);
         var gene = DecodeStrand(geneEncoded);
-        var templateStrand = GetTemplateStrand(strand);
-        var lcs = templateStrand.FindLongestCommonSubstring(gene);
-        var matchRate = (double)lcs.Length / gene.Length;
+        var templateStrand = GetTemplateStrand(strand!);
+        var lcs = templateStrand.FindLongestCommonSubstring(gene!);
+        var matchRate = (double)lcs.Length / gene!.Length;
 
         return matchRate >= 0.5;
     }

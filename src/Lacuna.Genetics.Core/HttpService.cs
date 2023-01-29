@@ -24,7 +24,6 @@ public class HttpService : IHttpService
 
     private static string _accessToken = string.Empty;
     private static DateTime _accessTokenExpiration;
-
     private readonly User _user;
 
     public HttpService(User user)
@@ -32,6 +31,10 @@ public class HttpService : IHttpService
         _user = user;
     }
 
+    /// <summary>
+    ///     Request a new job from the server.
+    /// </summary>
+    /// <returns>A Job object with the job's data.</returns>
     public async Task<Job> RequestJobAsync()
     {
         await GetAuthorization();
@@ -39,34 +42,18 @@ public class HttpService : IHttpService
         return GetResponseContent(response).Result.Job!;
     }
 
-    public async Task<Response> SubmitEncodeStrandAsync(string jobId, Result result)
+    public async Task<Response> SubmitJobAsync(string jobId, string endpoint, Result result)
     {
         await GetAuthorization();
-        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode",
-            result, JsonOptions);
-        return await GetResponseContent(response);
-    }
-
-    public async Task<Response> SubmitDecodeStrandAsync(string jobId, Result result)
-    {
-        await GetAuthorization();
-        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode",
-            result, JsonOptions);
-        return await GetResponseContent(response);
-    }
-
-    public async Task<Response> SubmitCheckGeneAsync(string jobId, Result result)
-    {
-        await GetAuthorization();
-        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene",
+        var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/{endpoint}",
             result, JsonOptions);
         return await GetResponseContent(response);
     }
 
     /// <summary>
-    ///     Get a new Access Token if the current one is empty or expired.
+    ///     Refresh the Token and set the Authorization header. It means to be used BEFORE each request.
     /// </summary>
-    private async Task RefreshTokenAsync()
+    private async Task GetAuthorization()
     {
         if (!string.IsNullOrEmpty(_accessToken) && _accessTokenExpiration >= DateTime.Now)
         {
@@ -76,14 +63,6 @@ public class HttpService : IHttpService
         var response = await Client.PostAsJsonAsync("api/users/login", _user);
         _accessToken = GetResponseContent(response).Result.AccessToken!;
         _accessTokenExpiration = DateTime.Now.AddMinutes(2);
-    }
-
-    /// <summary>
-    ///     Refresh the Token and set the Authorization header. It means to be used BEFORE each request.
-    /// </summary>
-    private async Task GetAuthorization()
-    {
-        await RefreshTokenAsync();
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
     }
 
