@@ -12,7 +12,8 @@ public class HttpService : IHttpService
 {
     private static readonly HttpClient Client = new()
     {
-        BaseAddress = new Uri("https://gene.lacuna.cc/")
+        BaseAddress = new Uri("https://gene.lacuna.cc/"),
+        DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
     };
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -33,14 +34,14 @@ public class HttpService : IHttpService
 
     public async Task<Job> RequestJobAsync()
     {
-        await GetHttpClient(true);
+        await GetAuthorization();
         var response = await Client.GetAsync("api/dna/jobs");
         return GetResponseContent(response).Result.Job!;
     }
 
     public async Task<Response> SubmitEncodeStrandAsync(string jobId, Result result)
     {
-        await GetHttpClient(true);
+        await GetAuthorization();
         var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/encode",
             result, JsonOptions);
         return await GetResponseContent(response);
@@ -48,7 +49,7 @@ public class HttpService : IHttpService
 
     public async Task<Response> SubmitDecodeStrandAsync(string jobId, Result result)
     {
-        await GetHttpClient(true);
+        await GetAuthorization();
         var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/decode",
             result, JsonOptions);
         return await GetResponseContent(response);
@@ -56,7 +57,7 @@ public class HttpService : IHttpService
 
     public async Task<Response> SubmitCheckGeneAsync(string jobId, Result result)
     {
-        await GetHttpClient(true);
+        await GetAuthorization();
         var response = await Client.PostAsJsonAsync($"api/dna/jobs/{jobId}/gene",
             result, JsonOptions);
         return await GetResponseContent(response);
@@ -72,27 +73,18 @@ public class HttpService : IHttpService
             return;
         }
 
-        await GetHttpClient(false);
         var response = await Client.PostAsJsonAsync("api/users/login", _user);
         _accessToken = GetResponseContent(response).Result.AccessToken!;
         _accessTokenExpiration = DateTime.Now.AddMinutes(2);
     }
 
     /// <summary>
-    ///     Get the HttpClient from the class, clear the headers and add the Accept and Authorization headers.
-    ///     It means to be used BEFORE each request.
+    ///     Refresh the Token and set the Authorization header. It means to be used BEFORE each request.
     /// </summary>
-    /// <param name="authorize">Whether the Authorization header is needed.</param>
-    private async Task GetHttpClient(bool authorize)
+    private async Task GetAuthorization()
     {
-        Client.DefaultRequestHeaders.Accept.Clear();
-        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        if (authorize)
-        {
-            await RefreshTokenAsync();
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-        }
+        await RefreshTokenAsync();
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
     }
 
     /// <summary>

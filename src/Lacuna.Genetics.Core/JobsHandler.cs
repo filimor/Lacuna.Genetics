@@ -54,21 +54,23 @@ public class JobsHandler
                 result = new Result { StrandEncoded = encodedStrand };
                 response = await _httpService.SubmitEncodeStrandAsync(job.Id,
                     result);
-                return new Tuple<Response, Result>(response, result);
+                break;
             case JobType.DecodeStrand:
                 var decodedStrand = _laboratory.DecodeStrand(job.StrandEncoded!);
                 result = new Result { Strand = decodedStrand };
                 response = await _httpService.SubmitDecodeStrandAsync(job.Id,
                     result);
-                return new Tuple<Response, Result>(response, result);
+                break;
             case JobType.CheckGene:
                 var isActivated = _laboratory.CheckGene(job.StrandEncoded!, job.GeneEncoded!);
                 result = new Result { IsActivated = isActivated };
                 response = await _httpService.SubmitCheckGeneAsync(job.Id,
                     result);
-                return new Tuple<Response, Result>(response, result);
+                break;
             default:
                 throw new Exception("Unknown job type");
         }
+
+        return new Tuple<Response, Result>(response, result);
     }
 }
