@@ -3,7 +3,7 @@
 namespace Lacuna.Genetics.Core.Exceptions;
 
 /// <summary>
-///     The HttpException is thrown when the HTTP request doesn't return a success status code.
+///     The HttpException is thrown when the HTTP request doesn't return a success status code (200-299).
 /// </summary>
 public class HttpException : Exception
 {

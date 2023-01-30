@@ -4,11 +4,29 @@ namespace Lacuna.Genetics.Core.Models;
 
 public class Job
 {
+    [NonSerialized] public const string EncodeStrand = "EncodeStrand";
+    [NonSerialized] public const string DecodeStrand = "DecodeStrand";
+    [NonSerialized] public const string CheckGene = "CheckGene";
+
+    [NonSerialized] private static readonly Dictionary<string, string> Endpoints = new()
+    {
+        { EncodeStrand, "api/dna/jobs/{0}/encode" },
+        { DecodeStrand, "api/dna/jobs/{0}/decode" },
+        { CheckGene, "api/dna/jobs/{0}/gene" }
+    };
+
     public string Id { get; set; } = default!;
     public string Type { get; set; } = default!;
     public string? Strand { get; set; }
     public string? StrandEncoded { get; set; }
     public string? GeneEncoded { get; set; }
+
+    public static string GetEndpoint(string type, string jobId)
+    {
+        return !Endpoints.TryGetValue(type, out var endpoint)
+            ? throw new Exception("Unknown job type.")
+            : string.Format(endpoint, jobId);
+    }
 
     public override string ToString()
     {

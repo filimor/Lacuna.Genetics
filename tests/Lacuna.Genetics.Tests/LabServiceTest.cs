@@ -5,17 +5,17 @@ using Xunit;
 
 namespace Lacuna.Genetics.Tests;
 
-public class LaboratoryTest
+public class LabServiceTest
 {
     [Theory]
     [ClassData(typeof(StrandsClassData))]
     public void DecodeStrand_OnValidInput_ReturnsValidOutput(string expectedStrand, string encodedStrand)
     {
         // Arrange
-        var laboratory = new LabService();
+        var labService = new LabService();
 
         // Act
-        var decodedStrand = laboratory.DecodeStrand(encodedStrand);
+        var decodedStrand = labService.DecodeStrand(encodedStrand);
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
@@ -26,10 +26,10 @@ public class LaboratoryTest
     public void EncodeStrand_OnValidInput_ReturnsValidOutput(string encodedStrand, string expectedStrand)
     {
         // Arrange
-        var laboratory = new LabService();
+        var labService = new LabService();
 
         // Act
-        var decodedStrand = laboratory.EncodeStrand(encodedStrand);
+        var decodedStrand = labService.EncodeStrand(encodedStrand);
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
@@ -41,10 +41,10 @@ public class LaboratoryTest
     public void CheckGene_OnActivatedGene_ReturnsTrue(string gene, string strand)
     {
         // Arrange
-        var laboratory = new LabService();
+        var labService = new LabService();
 
         // Act
-        var result = laboratory.CheckGene(strand, gene);
+        var result = labService.CheckGene(strand, gene);
 
         // Assert
         result.Should().BeTrue();
@@ -55,10 +55,10 @@ public class LaboratoryTest
     public void CheckGene_OnInactivatedGene_ReturnsFalse(string gene, string strand)
     {
         // Arrange
-        var laboratory = new LabService();
+        var labService = new LabService();
 
         //  Act
-        var result = laboratory.CheckGene(strand, gene);
+        var result = labService.CheckGene(strand, gene);
 
         // Assert
         result.Should().BeFalse();

@@ -50,7 +50,7 @@ public class JobsHandler
             IsActivated = _labService.CheckGene(job.StrandEncoded!, job.GeneEncoded!)
         };
 
-        var endpoint = JobType.GetEndpoint(job.Type, job.Id);
+        var endpoint = Job.GetEndpoint(job.Type, job.Id);
         var response = await _httpService.SubmitJobAsync(endpoint, result);
         return new Tuple<Response, Result>(response, result);
     }

@@ -2,6 +2,12 @@
 
 public static class StringExtensions
 {
+    /// <summary>
+    ///     Compare two strings and look for the longest common substring.
+    /// </summary>
+    /// <param name="string1">The first string.</param>
+    /// <param name="string2">The second string.</param>
+    /// <returns>The longest common substring.</returns>
     public static string FindLongestCommonSubstring(this string string1, string string2)
     {
         var m = string1.Length;
