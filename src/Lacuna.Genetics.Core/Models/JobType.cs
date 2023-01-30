@@ -6,14 +6,17 @@ public class JobType
     public const string DecodeStrand = "DecodeStrand";
     public const string CheckGene = "CheckGene";
 
+    private static readonly Dictionary<string, string> Endpoints = new()
+    {
+        { EncodeStrand, "api/dna/jobs/{0}/encode" },
+        { DecodeStrand, "api/dna/jobs/{0}/decode" },
+        { CheckGene, "api/dna/jobs/{0}/gene" }
+    };
+
     public static string GetEndpoint(string type, string jobId)
     {
-        return type switch
-        {
-            EncodeStrand => $"api/dna/jobs/{jobId}/encode",
-            DecodeStrand => $"api/dna/jobs/{jobId}/decode",
-            CheckGene => $"api/dna/jobs/{jobId}/gene",
-            _ => throw new Exception("Unknown job type.")
-        };
+        return !Endpoints.TryGetValue(type, out var endpoint)
+            ? throw new Exception("Unknown job type.")
+            : string.Format(endpoint, jobId);
     }
 }

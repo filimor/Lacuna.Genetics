@@ -4,7 +4,7 @@ using Lacuna.Genetics.Core.Interfaces;
 
 namespace Lacuna.Genetics.Core;
 
-public class Laboratory : ILaboratory
+public class LabService : ILabService
 {
     /// <summary>
     ///     Encode a strand from the String to the Base64 format.

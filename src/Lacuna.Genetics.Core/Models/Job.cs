@@ -16,11 +16,18 @@ public class Job
 
         sb.AppendLine($"JOB ID: {Id}");
         sb.AppendLine($"JOB TYPE: {Type}\n");
-        sb.AppendLine(Type == JobType.EncodeStrand
-            ? $"STRAND:\n{Strand}"
-            : $"STRAND ENCODED:\n{StrandEncoded}");
 
-        if (Type == JobType.CheckGene)
+        if (Strand != null)
+        {
+            sb.AppendLine($"STRAND:\n{Strand}");
+        }
+
+        if (StrandEncoded != null)
+        {
+            sb.AppendLine($"STRAND ENCODED:\n{StrandEncoded}");
+        }
+
+        if (GeneEncoded != null)
         {
             sb.AppendLine($"\nGENE ENCODED:\n{GeneEncoded}");
         }

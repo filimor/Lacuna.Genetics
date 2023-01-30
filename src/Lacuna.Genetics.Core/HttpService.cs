@@ -37,9 +37,9 @@ public class HttpService : IHttpService
     /// <returns>A Job object with the job's data.</returns>
     public async Task<Job> RequestJobAsync()
     {
-        await GetAuthorization();
+        await GetAuthorizationAsync();
         var response = await Client.GetAsync("api/dna/jobs");
-        return GetResponseContent(response).Result.Job!;
+        return GetResponseContentAsync(response).Result.Job!;
     }
 
     /// <summary>
@@ -50,16 +50,16 @@ public class HttpService : IHttpService
     /// <returns>The response gotten.</returns>
     public async Task<Response> SubmitJobAsync(string endpoint, Result result)
     {
-        await GetAuthorization();
+        await GetAuthorizationAsync();
         var response = await Client.PostAsJsonAsync(endpoint,
             result, JsonOptions);
-        return await GetResponseContent(response);
+        return await GetResponseContentAsync(response);
     }
 
     /// <summary>
     ///     Refresh the Token and set the Authorization header. It means to be used BEFORE each request.
     /// </summary>
-    private async Task GetAuthorization()
+    private async Task GetAuthorizationAsync()
     {
         if (!string.IsNullOrEmpty(_accessToken) && _accessTokenExpiration >= DateTime.Now)
         {
@@ -67,7 +67,7 @@ public class HttpService : IHttpService
         }
 
         var response = await Client.PostAsJsonAsync("api/users/login", _user);
-        _accessToken = GetResponseContent(response).Result.AccessToken!;
+        _accessToken = GetResponseContentAsync(response).Result.AccessToken!;
         _accessTokenExpiration = DateTime.Now.AddMinutes(2);
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
     }
@@ -80,7 +80,7 @@ public class HttpService : IHttpService
     /// <returns></returns>
     /// <exception cref="HttpException">Thrown if the response doesn't have a success code (200-299).</exception>
     /// <exception cref="ApiException">Thrown if the 'Code' attribute of the response body isn't Success.</exception>
-    private static async Task<Response> GetResponseContent(HttpResponseMessage response)
+    private static async Task<Response> GetResponseContentAsync(HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode)
         {

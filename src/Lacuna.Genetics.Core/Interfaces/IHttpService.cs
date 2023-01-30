@@ -5,5 +5,5 @@ namespace Lacuna.Genetics.Core.Interfaces;
 public interface IHttpService
 {
     Task<Job> RequestJobAsync();
-    Task<Response> SubmitJobAsync(string jobEndpoint, Result result);
+    Task<Response> SubmitJobAsync(string endpoint, Result result);
 }

@@ -12,7 +12,7 @@ public class LaboratoryTest
     public void DecodeStrand_OnValidInput_ReturnsValidOutput(string expectedStrand, string encodedStrand)
     {
         // Arrange
-        var laboratory = new Laboratory();
+        var laboratory = new LabService();
 
         // Act
         var decodedStrand = laboratory.DecodeStrand(encodedStrand);
@@ -26,7 +26,7 @@ public class LaboratoryTest
     public void EncodeStrand_OnValidInput_ReturnsValidOutput(string encodedStrand, string expectedStrand)
     {
         // Arrange
-        var laboratory = new Laboratory();
+        var laboratory = new LabService();
 
         // Act
         var decodedStrand = laboratory.EncodeStrand(encodedStrand);
@@ -41,7 +41,7 @@ public class LaboratoryTest
     public void CheckGene_OnActivatedGene_ReturnsTrue(string gene, string strand)
     {
         // Arrange
-        var laboratory = new Laboratory();
+        var laboratory = new LabService();
 
         // Act
         var result = laboratory.CheckGene(strand, gene);
@@ -55,7 +55,7 @@ public class LaboratoryTest
     public void CheckGene_OnInactivatedGene_ReturnsFalse(string gene, string strand)
     {
         // Arrange
-        var laboratory = new Laboratory();
+        var laboratory = new LabService();
 
         //  Act
         var result = laboratory.CheckGene(strand, gene);
