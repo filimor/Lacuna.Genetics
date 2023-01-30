@@ -1,8 +1,8 @@
-﻿namespace Lacuna.Genetics.Core.Interfaces;
+﻿using Lacuna.Genetics.Core.Models;
+
+namespace Lacuna.Genetics.Core.Interfaces;
 
 public interface ILabService
 {
-    string? EncodeStrand(string strand);
-    string? DecodeStrand(string strand);
-    bool? CheckGene(string strandEncoded, string geneEncoded);
+    Result Analyze(Job job);
 }

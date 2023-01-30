@@ -1,17 +1,37 @@
 ﻿using System.Text;
 using Lacuna.Genetics.Core.Extensions;
 using Lacuna.Genetics.Core.Interfaces;
+using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
 
 public class LabService : ILabService
 {
     /// <summary>
+    ///     Select the proper method to analyze the job, according to its type, and return the result.
+    /// </summary>
+    /// <param name="job">The job to be analyzed.</param>
+    /// <returns>The result of the analysis.</returns>
+    /// <exception cref="Exception">Thrown if the job type is unknown.</exception>
+    public Result Analyze(Job job)
+    {
+        var result = job.Type switch
+        {
+            Job.EncodeStrand => new Result { StrandEncoded = EncodeStrand(job.Strand!) },
+            Job.DecodeStrand => new Result { Strand = DecodeStrand(job.StrandEncoded!) },
+            Job.CheckGene => new Result { IsActivated = CheckGene(job.StrandEncoded!, job.GeneEncoded!) },
+            _ => throw new Exception("Unknown job type.")
+        };
+
+        return result;
+    }
+
+    /// <summary>
     ///     Encode a strand from the String to the Base64 format.
     /// </summary>
     /// <param name="strand">A strand in the String format.</param>
     /// <returns>The strand in the Base64 format.</returns>
-    public string? EncodeStrand(string strand)
+    private static string? EncodeStrand(string strand)
     {
         if (string.IsNullOrEmpty(strand))
         {
@@ -46,7 +66,7 @@ public class LabService : ILabService
     /// </summary>
     /// <param name="strand">A Strand in the Base64 format.</param>
     /// <returns>The strand in the String format.</returns>
-    public string? DecodeStrand(string strand)
+    private static string? DecodeStrand(string strand)
     {
         if (string.IsNullOrEmpty(strand))
         {
@@ -82,7 +102,7 @@ public class LabService : ILabService
     /// <param name="strandEncoded">A strand in the Base64 format.</param>
     /// <param name="geneEncoded">A gene in the Base64 format.</param>
     /// <returns></returns>
-    public bool? CheckGene(string strandEncoded, string geneEncoded)
+    private static bool? CheckGene(string strandEncoded, string geneEncoded)
     {
         if (string.IsNullOrEmpty(strandEncoded) || string.IsNullOrEmpty(geneEncoded))
         {

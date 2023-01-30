@@ -8,7 +8,8 @@ public class Job
     [NonSerialized] public const string DecodeStrand = "DecodeStrand";
     [NonSerialized] public const string CheckGene = "CheckGene";
 
-    [NonSerialized] private static readonly Dictionary<string, string> Endpoints = new()
+    [NonSerialized]
+    private static readonly Dictionary<string, string> Endpoints = new()
     {
         { EncodeStrand, "api/dna/jobs/{0}/encode" },
         { DecodeStrand, "api/dna/jobs/{0}/decode" },
@@ -23,9 +24,7 @@ public class Job
 
     public static string GetEndpoint(string type, string jobId)
     {
-        return !Endpoints.TryGetValue(type, out var endpoint)
-            ? throw new Exception("Unknown job type.")
-            : string.Format(endpoint, jobId);
+        return Endpoints[type].Replace("{0}", jobId);
     }
 
     public override string ToString()
