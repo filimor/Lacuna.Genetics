@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Lacuna.Genetics.Core.Interfaces;
+﻿using Lacuna.Genetics.Core.Interfaces;
 using Lacuna.Genetics.Core.Models;
 
 namespace Lacuna.Genetics.Core;
@@ -27,7 +26,7 @@ public class JobsHandler
         var result = HandleJob(job);
         var response = await SendJobAsync(endpoint, result);
         response.Job = job;
-        
+
         return new Tuple<Response, Result>(response, result);
     }
 

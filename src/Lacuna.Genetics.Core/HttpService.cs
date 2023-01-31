@@ -47,7 +47,7 @@ public class HttpService : IHttpService
     /// </summary>
     /// <param name="endpoint">The endpoint to send the result.</param>
     /// <param name="result">The Result object with the parameters to send.</param>
-    /// <returns>The response gotten.</returns>
+    /// <returns>The response obtained.</returns>
     public async Task<Response> SubmitJobAsync(string endpoint, Result result)
     {
         await GetAuthorizationAsync();

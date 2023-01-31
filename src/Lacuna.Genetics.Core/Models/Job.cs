@@ -8,8 +8,7 @@ public class Job
     [NonSerialized] public const string DecodeStrand = "DecodeStrand";
     [NonSerialized] public const string CheckGene = "CheckGene";
 
-    [NonSerialized]
-    private static readonly Dictionary<string, string> Endpoints = new()
+    [NonSerialized] private static readonly Dictionary<string, string> Endpoints = new()
     {
         { EncodeStrand, "api/dna/jobs/{0}/encode" },
         { DecodeStrand, "api/dna/jobs/{0}/decode" },

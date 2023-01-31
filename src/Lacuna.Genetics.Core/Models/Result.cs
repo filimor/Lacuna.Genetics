@@ -24,7 +24,7 @@ public class Result
 
         if (IsActivated != null)
         {
-            sb.AppendLine($"\nIS ACTIVATED: {IsActivated}");
+            sb.AppendLine($"IS ACTIVATED: {IsActivated}");
         }
 
         return sb.ToString();

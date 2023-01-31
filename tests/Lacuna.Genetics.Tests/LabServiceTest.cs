@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lacuna.Genetics.Core;
+using Lacuna.Genetics.Core.Models;
 using Lacuna.Genetics.Tests.ClassData;
 using Xunit;
 
@@ -9,32 +10,33 @@ public class LabServiceTest
 {
     [Theory]
     [ClassData(typeof(StrandsClassData))]
-    public void DecodeStrand_OnValidInput_ReturnsValidOutput(string expectedStrand, string encodedStrand)
+    public void EncodeStrand_OnValidInput_ReturnsValidOutput(string decodedStrand, string expectedStrand)
     {
         // Arrange
         var labService = new LabService();
+        var job = new Job { Strand = decodedStrand, Type = Job.EncodeStrand };
 
         // Act
-        var decodedStrand = labService.DecodeStrand(encodedStrand);
+        var encodedStrand = labService.Analyze(job).StrandEncoded;
 
         // Assert
-        decodedStrand.Should().Be(expectedStrand);
+        encodedStrand.Should().Be(expectedStrand);
     }
 
     [Theory]
     [ClassData(typeof(StrandsClassData))]
-    public void EncodeStrand_OnValidInput_ReturnsValidOutput(string encodedStrand, string expectedStrand)
+    public void DecodeStrand_OnValidInput_ReturnsValidOutput(string expectedStrand, string encodedStrand)
     {
         // Arrange
         var labService = new LabService();
+        var job = new Job { StrandEncoded = encodedStrand, Type = Job.DecodeStrand };
 
         // Act
-        var decodedStrand = labService.EncodeStrand(encodedStrand);
+        var decodedStrand = labService.Analyze(job).Strand;
 
         // Assert
         decodedStrand.Should().Be(expectedStrand);
     }
-
 
     [Theory]
     [ClassData(typeof(ActivatedGenesClassData))]
@@ -42,9 +44,10 @@ public class LabServiceTest
     {
         // Arrange
         var labService = new LabService();
+        var job = new Job { StrandEncoded = strand, GeneEncoded = gene, Type = Job.CheckGene };
 
         // Act
-        var result = labService.CheckGene(strand, gene);
+        var result = labService.Analyze(job).IsActivated;
 
         // Assert
         result.Should().BeTrue();
@@ -56,9 +59,10 @@ public class LabServiceTest
     {
         // Arrange
         var labService = new LabService();
+        var job = new Job { StrandEncoded = strand, GeneEncoded = gene, Type = Job.CheckGene };
 
         //  Act
-        var result = labService.CheckGene(strand, gene);
+        var result = labService.Analyze(job).IsActivated;
 
         // Assert
         result.Should().BeFalse();
